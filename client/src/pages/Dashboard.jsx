@@ -1,9 +1,25 @@
-import React from 'react';
+import React, { useContext, useEffect } from 'react';
 import { NavLink, Outlet, useNavigate } from 'react-router-dom';
 import { assets } from '../assets/assets';
+import { AppContext } from '../context/AppContext';
 
 const Dashboard = () => {
     const navigate = useNavigate();
+
+    const { companyData, setCompanyData, setCompanyToken } = useContext(AppContext);
+
+    const logout = () => {
+        setCompanyToken(null);
+        localStorage.removeItem('companyToken');
+        setCompanyData(null);
+        navigate('/');
+    };
+
+    useEffect(() => {
+        if (companyData) {
+            navigate('/dashboard/manage-job');
+        }
+    }, [companyData]);
 
     return (
         <div className="min-h-screen">
@@ -16,17 +32,25 @@ const Dashboard = () => {
                         src={assets.logo}
                         alt=""
                     />
-                    <div className="flex items-center gap-3">
-                        <p className="max-sm:hidden">Welcome, MinhDat</p>
-                        <div className="relative group cursor-pointer">
-                            <img className="w-8 border border-gray-400 rounded-full" src={assets.company_icon} alt="" />
-                            <div className="absolute hidden group-hover:block top-0 right-0 z-10 text-black rounded pt-12">
-                                <ul className="list-none m-0 p-2 bg-white rounded-md border border-gray-400 text-sm">
-                                    <li className="py-1 px-2 cursor-pointer pr-10">Logout</li>
-                                </ul>
+                    {companyData && (
+                        <div className="flex items-center gap-3">
+                            <p className="max-sm:hidden">Welcome, {companyData.name}</p>
+                            <div className="relative group cursor-pointer">
+                                <img
+                                    className="w-8 border border-gray-400 rounded-full"
+                                    src={companyData.image}
+                                    alt=""
+                                />
+                                <div className="absolute hidden group-hover:block top-0 right-0 z-10 text-black rounded pt-12">
+                                    <ul className="list-none m-0 p-2 bg-white rounded-md border border-gray-400 text-sm">
+                                        <li onClick={logout} className="py-1 px-2 cursor-pointer pr-10">
+                                            Logout
+                                        </li>
+                                    </ul>
+                                </div>
                             </div>
                         </div>
-                    </div>
+                    )}
                 </div>
             </div>
 
@@ -70,7 +94,7 @@ const Dashboard = () => {
                     </ul>
                 </div>
                 {/* Content */}
-                <div>
+                <div className="flex-1 h-full p-2 sm:p-5">
                     <Outlet />
                 </div>
             </div>
